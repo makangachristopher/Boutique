@@ -17,8 +17,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     'Fast delivery to your doorstep'
   ];
   final List<String> _imagePaths = [
-    'assets/images/item1.jpg',
-    'assets/images/item2.jpg',
+    'assets/images/image1.jpg',
+    'assets/images/image2.jpg',
     'assets/images/item3.jpg',
   ];
 
@@ -59,20 +59,20 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 Text(
                   _taglines[_currentIndex],
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 24.0,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(height: 16.0),
+                const SizedBox(height: 16.0),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.amber,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       )),
-                  child: Text('Start Here'),
+                  child: const Text('Start Here'),
                   onPressed: () {
                     // Navigator.push(
                     //   context,
