@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+
 class BuildBottomMenu extends StatelessWidget {
 
   @override
@@ -13,7 +14,9 @@ class BuildBottomMenu extends StatelessWidget {
       children: <Widget>[
         IconButton(
           icon: Icon(Icons.home),
-          onPressed: () {},
+          onPressed: () {
+            Navigator.pushNamed(context, '/home');
+          },
         ),
         IconButton(
           icon: Icon(Icons.category),
@@ -23,7 +26,7 @@ class BuildBottomMenu extends StatelessWidget {
         ),
         IconButton(
           icon: Icon(Icons.search),
-          onPressed: () {},
+          onPressed: () {Navigator.pushNamed(context, '/search');},
         ),
         IconButton(
           icon: Icon(Icons.shopping_cart),
@@ -41,34 +44,3 @@ class BuildBottomMenu extends StatelessWidget {
     ),
   );
 }}
-
-
-
-// bottomNavigationBar: BottomNavigationBar(
-// currentIndex: _currentTab,
-// onTap: (int index) {
-// setState(() {
-// _currentTab = index;
-// });
-// },
-// items: [
-// BottomNavigationBarItem(
-// icon: Icon(Icons.home),
-// label: 'Home',
-// ),
-// BottomNavigationBarItem(
-// icon: Icon(Icons.category),
-// label: 'Search',
-// ),
-// BottomNavigationBarItem(
-// icon: Icon(Icons.shopping_cart),
-// label: 'Favorites',
-// ),
-// BottomNavigationBarItem(
-// icon: Icon(Icons.person),
-// label: 'Settings',
-// ),
-// ],
-// selectedItemColor: Colors.yellowAccent,
-//
-// ),

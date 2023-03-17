@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:la_pic/screens/home_screen.dart';
 import 'package:la_pic/screens/login_screen.dart';
 
 class WelcomeScreen extends StatefulWidget {
@@ -74,10 +75,10 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       )),
                   child: const Text('Start Here'),
                   onPressed: () {
-                    // Navigator.push(
-                    //   context,
-                    //   MaterialPageRoute(builder: (context) => LoginPage()),
-                    // );
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => HomeScreen()),
+                    );
                   },
                 ),
               ],
