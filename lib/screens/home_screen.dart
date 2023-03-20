@@ -10,14 +10,21 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  int selectedIndex = 0;
 
-  int _currentTab = 0;
+  final List<String> tabTitles = [
+    'All',
+    'Popular',
+    'Recent',
+    'Recommended',
+  ];
 
-  void _onTabSelected(int index) {
-    setState(() {
-      _currentTab = index;
-    });
-  }
+
+  // void _onTabSelected(int index) {
+  //   setState(() {
+  //     _currentTab = index;
+  //   });
+  // }
   List<String> _items =
       List.generate(40, (index) => 'assets/images/item${index % 10}.jpg');
 
@@ -52,24 +59,39 @@ class _HomeScreenState extends State<HomeScreen> {
         body: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                BuildTabItem(title: 'All',
-                  index: 0,
-                  onTabSelected: _onTabSelected,
-                  isActive: _currentTab == 0,),
-                BuildTabItem(title: 'Popular', index: 1,
-                  onTabSelected: _onTabSelected,
-                  isActive: _currentTab == 1,),
-                BuildTabItem(title: 'Recent', index: 2,
-                  onTabSelected: _onTabSelected,
-                  isActive: _currentTab == 2,),
-                BuildTabItem(title: 'Recommended', index: 3,
-                  onTabSelected: _onTabSelected,
-                  isActive: _currentTab == 3,),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: tabTitles.asMap().entries.map((entry) {
+                      final int index = entry.key;
+                      final String title = entry.value;
+
+                      return Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: BuildTabItem(
+                          title: title,
+                          index: index,
+                          onTabSelected: (index) {
+                            setState(() {
+                              selectedIndex = index;
+                            });
+                          },
+                          isActive: selectedIndex == index,
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+                const SizedBox(height: 16.0),
+                // Text(
+                //   'Selected tab: ${tabTitles[selectedIndex]}',
+                //   style: TextStyle(fontSize: 20.0),
+                // ),
               ],
-            ),
+            )
           ),
           BuildItemList(
             items: _items,

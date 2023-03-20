@@ -12,7 +12,7 @@ class ProductDetailsScreen extends StatelessWidget {
         elevation: 0.0,
         title: const Center(
           child: Text(
-            'LaEpic Boutique',
+            'Product Details',
             style: TextStyle(
               color: Colors.black,
               fontWeight: FontWeight.bold,
@@ -36,15 +36,18 @@ class ProductDetailsScreen extends StatelessWidget {
       body:  Column(
           children: [
             Expanded(
-              child: Container(
-                decoration: const BoxDecoration(
-                  borderRadius: BorderRadius.vertical(
-                    bottom: Radius.circular(20),
-                    top: Radius.circular(20),
-                  ),
-                  image: DecorationImage(
-                    image: AssetImage('assets/images/item1.jpg'),
-                    fit: BoxFit.cover,
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Container(
+                  decoration: const BoxDecoration(
+                    borderRadius: BorderRadius.vertical(
+                      bottom: Radius.circular(20),
+                      top: Radius.circular(20),
+                    ),
+                    image: DecorationImage(
+                      image: AssetImage('assets/images/item1.jpg'),
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
               ),
@@ -87,6 +90,7 @@ class ProductDetailsScreen extends StatelessWidget {
                           buildSizeOption(context, 'S'),
                           buildSizeOption(context, 'M'),
                           buildSizeOption(context, 'L'),
+                          buildSizeOption(context, 'XL'),
                         ],
                       ),
                       const SizedBox(height: 20),
@@ -102,7 +106,9 @@ class ProductDetailsScreen extends StatelessWidget {
                                 width: 150,
                                 height: 44,
                                 child: ElevatedButton(
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    Navigator.pushNamed(context, '/checkout');
+                                  },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.yellow,
                                     shape: RoundedRectangleBorder(
@@ -121,7 +127,9 @@ class ProductDetailsScreen extends StatelessWidget {
                               ),
                               IconButton(
                                 icon: const Icon(Icons.shopping_cart_rounded, color: Colors.yellow),
-                                onPressed: () {},
+                                onPressed: () {
+                                  Navigator.pushNamed(context, '/cart');
+                                },
                               ),
                             ],
                           ),
@@ -138,9 +146,12 @@ class ProductDetailsScreen extends StatelessWidget {
   }
 
   Widget buildSizeOption(BuildContext context, String size) {
+
     final bool isSelected = size == 'M';
     return GestureDetector(
-      onTap: () {},
+      onTap: () {
+
+      },
       child: Container(
         margin: const EdgeInsets.only(right: 10),
         padding: const EdgeInsets.all(10),

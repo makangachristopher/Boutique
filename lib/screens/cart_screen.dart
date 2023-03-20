@@ -82,7 +82,9 @@ class Payment_button extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.all(20.0),
           child: TextButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.pushNamed(context, '/checkout');
+            },
             style: ButtonStyle(
               backgroundColor: MaterialStateProperty.all<Color>(Colors.yellow),
               shape: MaterialStateProperty.all<RoundedRectangleBorder>(
