@@ -1,204 +1,208 @@
+// import 'dart:io';
+//
 // import 'package:flutter/material.dart';
+// import 'package:firebase_auth/firebase_auth.dart';
+// import 'package:firebase_storage/firebase_storage.dart';
+// import 'package:image_picker/image_picker.dart';
 //
-// class ProductCategoriesPage extends StatefulWidget {
+// class SignupScreen extends StatefulWidget {
 //   @override
-//   _ProductCategoriesPageState createState() => _ProductCategoriesPageState();
+//   _SignupScreenState createState() => _SignupScreenState();
 // }
-// class _ProductCategoriesPageState extends State<ProductCategoriesPage> {
-//   String _searchQuery = '';
-//   int _selectedCategoryIndex = 0;
-//   int _selectedSubCategoryIndex = 0;
 //
-//   List<String> _categories = [
-//     'All Products',
-//     'Electronics',
-//     'Fashion',
-//     'Books',
-//   ];
+// class _SignupScreenState extends State<SignupScreen> {
+//   final _formKey = GlobalKey<FormState>();
+//   final _emailController = TextEditingController();
+//   final _passwordController = TextEditingController();
+//   final _confirmPasswordController = TextEditingController();
+//   final _phoneNumberController = TextEditingController();
+//   final _firstNameController = TextEditingController();
+//   final _lastNameController = TextEditingController();
 //
-//   Map<String, List<String>> _subCategories = {
-//     'All Products': ['All Products'],
-//     'Electronics': [
-//       'All Electronics',
-//       'Mobile Phones',
-//       'Laptops',
-//       'Accessories',
-//     ],
-//     'Fashion': ['All Fashion', 'Men', 'Women', 'Kids'],
-//     'Books': ['All Books', 'Fiction', 'Non-Fiction'],
-//   };
+//   File? _profilePhoto;
 //
-//   Map<String, List<String>> _items = {
-//     'All Products': [
-//       'Product 1',
-//       'Product 2',
-//       'Product 3',
-//       'Product 4',
-//       'Product 5',
-//       'Product 6',
-//     ],
-//     'Mobile Phones': ['Phone 1', 'Phone 2', 'Phone 3'],
-//     'Laptops': ['Laptop 1', 'Laptop 2', 'Laptop 3'],
-//     'Accessories': ['Accessory 1', 'Accessory 2', 'Accessory 3'],
-//     'Men': ['Shirt', 'Trousers', 'Shoes', 'Watch'],
-//     'Women': ['Dress', 'Sandals', 'Handbag', 'Jewelry'],
-//     'Kids': ['Toy 1', 'Toy 2', 'Clothes'],
-//     'Fiction': ['Book 1', 'Book 2', 'Book 3'],
-//     'Non-Fiction': ['Book 4', 'Book 5', 'Book 6'],
-//   };
+//   String _errorMessage = '';
+//   bool _isLoading = false;
 //
-//   List<String> _subCategoryItems = [];
-//   String _selectedSubCategory = 'All Products';
+//   Future<void> _signup() async {
+//     final email = _emailController.text.trim();
+//     final password = _passwordController.text.trim();
+//     final phoneNumber = _phoneNumberController.text.trim();
+//     final firstName = _firstNameController.text.trim();
+//     final lastName = _lastNameController.text.trim();
+//
+//     setState(() {
+//       _isLoading = true;
+//     });
+//
+//     try {
+//       final userCredential =
+//       await FirebaseAuth.instance.createUserWithEmailAndPassword(
+//         email: email,
+//         password: password,
+//       );
+//
+//       final user = userCredential.user;
+//       final userId = user!.uid;
+//
+//       if (_profilePhoto != null) {
+//         final ref = FirebaseStorage.instance.ref().child('users').child(userId);
+//
+//         await ref.putFile(_profilePhoto!);
+//         final downloadUrl = await ref.getDownloadURL();
+//
+//         await user.updatePhotoURL(downloadUrl);
+//       }
+//
+//       await user.updateDisplayName('$firstName $lastName');
+//
+//       // Store additional user data, such as phone number, in a Firestore database
+//       // or in the Firebase Realtime Database.
+//
+//       Navigator.pushReplacementNamed(context, '/home');
+//     } on FirebaseAuthException catch (e) {
+//       setState(() {
+//         _errorMessage = e.message ?? 'An unknown error occurred';
+//       });
+//     } finally {
+//       setState(() {
+//         _isLoading = false;
+//       });
+//     }
+//   }
+//
+//   Future<void> _pickProfilePhoto() async {
+//     final pickedFile =
+//     await ImagePicker().pickImage(source: ImageSource.gallery);
+//
+//     if (pickedFile != null) {
+//       setState(() {
+//         _profilePhoto = File(pickedFile.path);
+//       });
+//     }
+//   }
 //
 //   @override
 //   Widget build(BuildContext context) {
 //     return Scaffold(
-//       appBar: AppBar(
-//         title: Text('Product Categories'),
-//       ),
-//       body: Column(
-//         crossAxisAlignment: CrossAxisAlignment.stretch,
-//         children: [
-//           _buildSearchTab(),
-//           _buildMenuTabs(),
-//           _buildSubCategoryTabs(),
-//           Expanded(
-//             child: _buildItemsList(),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-//
-//   Widget _buildSearchTab() {
-//     return Container(
-//       padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-//       child: TextField(
-//         decoration: InputDecoration(
-//           hintText: 'Search',
-//           prefixIcon: Icon(Icons.search),
-//           border: OutlineInputBorder(
-//             borderRadius: BorderRadius.circular(10.0),
+//       backgroundColor: Colors.amber,
+//       body: SingleChildScrollView(
+//         child: Container(
+//           height: MediaQuery.of(context).size.height,
+//           child: Column(
+//             crossAxisAlignment: CrossAxisAlignment.stretch,
+//             children: <Widget>[
+//               SizedBox(height: 50.0),
+//               Text(
+//                 'Sign up',
+//                 textAlign: TextAlign.center,
+//                 style: TextStyle(
+//                   fontSize: 30.0,
+//                   fontWeight: FontWeight.bold,
+//                   color: Colors.white,
+//                 ),
+//               ),
+//               Expanded(
+//                 child: Container(
+//                   decoration: BoxDecoration(
+//                     color: Colors.white,
+//                     borderRadius: BorderRadius.only(
+//                       topLeft: Radius.circular(40.0),
+//                     ),
+//                   ),
+//                   padding: EdgeInsets.symmetric(horizontal: 20.0),
+//                   child: Form(
+//                     key: _formKey,
+//                     child: Column(
+//                       mainAxisAlignment: MainAxisAlignment.center,
+//                       children: <Widget>[
+//                         GestureDetector(
+//                           onTap: _pickProfilePhoto,
+//                           child: Container(
+//                             height: 120.0,
+//                             width: 120.0,
+//                             decoration: BoxDecoration(
+//                               shape: BoxShape.circle,
+//                               border: Border.all(
+//                                 color: Colors.grey,
+//                                 width: 2.0,
+//                               ),
+//                             ),
+//                             child: _profilePhoto == null
+//                                 ? Icon(Icons.camera_alt, size: 60.0, color: Colors.grey[300])
+//                                 : ClipOval(
+//                               child: Image.file(_profilePhoto, fit: BoxFit.cover),
+//                             ),
+//                           ),
+//                         ),
+//                         SizedBox(height: 20.0),
+//                         TextFormField(
+//                           decoration: InputDecoration(
+//                             labelText: 'Name',
+//                             border: OutlineInputBorder(),
+//                           ),
+//                           validator: (value) {
+//                             if (value.isEmpty) {
+//                               return 'Please enter your name';
+//                             }
+//                             return null;
+//                           },
+//                           onSaved: (value) => _name = value,
+//                         ),
+//                         SizedBox(height: 20.0),
+//                         TextFormField(
+//                           decoration: InputDecoration(
+//                             labelText: 'Email',
+//                             border: OutlineInputBorder(),
+//                           ),
+//                           validator: (value) {
+//                             if (value.isEmpty) {
+//                               return 'Please enter your email';
+//                             }
+//                             if (!EmailValidator.validate(value)) {
+//                               return 'Please enter a valid email';
+//                             }
+//                             return null;
+//                           },
+//                           onSaved: (value) => _email = value,
+//                         ),
+//                         SizedBox(height: 20.0),
+//                         TextFormField(
+//                           obscureText: true,
+//                           decoration: InputDecoration(
+//                             labelText: 'Password',
+//                             border: OutlineInputBorder(),
+//                           ),
+//                           validator: (value) {
+//                             if (value.isEmpty) {
+//                               return 'Please enter a password';
+//                             }
+//                             if (value.length < 6) {
+//                               return 'Password must be at least 6 characters long';
+//                             }
+//                             return null;
+//                           },
+//                           onSaved: (value) => _password = value,
+//                         ),
+//                         SizedBox(height: 20.0),
+//                         ElevatedButton(
+//                           onPressed: _submitForm,
+//                           child: Text('Sign Up'),
+//                         ),
+//                       ],
+//                     ),
+//                   ),
+//                 ),
+//               ),
+//             ],
 //           ),
 //         ),
-//         onChanged: (value) {
-//           setState(() {
-//             _searchQuery = value;
-//           });
-//         },
-//       ),
-//     );
-//   }
-//
-//   Widget _buildMenuTabs() {
-//     return Container(
-//       height: 50.0,
-//       child: ListView.builder(
-//         scrollDirection: Axis.horizontal,
-//         itemCount: _categories.length,
-//         itemBuilder: (BuildContext context, int index) {
-//           return Padding(
-//             padding: EdgeInsets.symmetric(horizontal: 8.0),
-//             child: ChoiceChip(
-//               label: Text(_categories[index]),
-//               selected: _selectedCategoryIndex == index,
-//               onSelected: (isSelected) {
-//                 setState(() {
-//                   _selectedCategoryIndex = isSelected ? index : 0;
-//                   _selectedSubCategoryIndex = 0;
-//                   _selectedCategoryIndex = isSelected ? index : 0;
-//                   _subCategoryItems = _subCategories[_categories[index]] ?? [];
-//                   _selectedSubCategory = _subCategoryItems[0];
-//                   _items = _allItems
-//                       .where((item) =>
-//                   item.category == _categories[_selectedCategoryIndex] &&
-//                       item.subCategory == _selectedSubCategory)
-//                       .toList();
-//                 });
-//               },
-//             ),
-//           );
-//         },
-//       ),
-//     );
-//   }
-//
-//   Widget _buildSubCategoryTabs() {
-//     return Container(
-//       height: 50.0,
-//       child: ListView.builder(
-//         scrollDirection: Axis.horizontal,
-//         itemCount: _subCategoryItems.length,
-//         itemBuilder: (BuildContext context, int index) {
-//           return Padding(
-//             padding: EdgeInsets.symmetric(horizontal: 8.0),
-//             child: ChoiceChip(
-//               label: Text(_subCategoryItems[index]),
-//               selected: _selectedSubCategoryIndex == index,
-//               onSelected: (isSelected) {
-//                 setState(() {
-//                   _selectedSubCategoryIndex = isSelected ? index : 0;
-//                   _selectedSubCategory = _subCategoryItems[_selectedSubCategoryIndex];
-//                   _items = _allItems
-//                       .where((item) =>
-//                   item.category == _categories[_selectedCategoryIndex] &&
-//                       item.subCategory == _selectedSubCategory)
-//                       .toList();
-//                 });
-//               },
-//             ),
-//           );
-//         },
-//       ),
-//     );
-//   }
-//
-//   Widget _buildItemsList() {
-//     return Expanded(
-//       child: ListView.builder(
-//         itemCount: _items.length,
-//         itemBuilder: (BuildContext context, int index) {
-//           return ListTile(
-//             leading: Image.asset(_items[index].image),
-//             title: Text(_items[index].name),
-//             subtitle: Text(_items[index].description),
-//             trailing: Text(
-//               '$${_items[index].price.toStringAsFixed(2)}',
-//               style: TextStyle(fontSize: 20.0),
-//             ),
-//             onTap: () {
-// // Navigate to the details page
-//             },
-//           );
-//         },
-//       ),
-//     );
-//   }
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text('Product Categories'),
-//         actions: [
-//           IconButton(
-//             icon: Icon(Icons.search),
-//             onPressed: () {
-// // Open search page
-//             },
-//           ),
-//         ],
-//       ),
-//       body: Column(
-//         children: [
-//           _buildMenuTabs(),
-//           _buildSubCategoryTabs(),
-//           _buildItemsList(),
-//         ],
 //       ),
 //     );
 //   }
 // }
+//
+//
 //
 //
 //

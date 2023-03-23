@@ -3,12 +3,18 @@ import 'package:la_pic/screens/home_screen.dart';
 import 'package:la_pic/screens/product_categories_screen.dart';
 import 'package:la_pic/screens/product_details_screen.dart';
 import 'package:la_pic/screens/cart_screen.dart';
+import 'package:la_pic/screens/login_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:la_pic/screens/search_results_screen.dart';
 import 'package:la_pic/screens/check_out_screen.dart';
 import 'package:la_pic/screens/welcome_screen.dart';
+import 'package:la_pic/screens/signup.dart';
+import 'package:firebase_core/firebase_core.dart';
 
-void main() {
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  // await Firebase.initializeApp();
   runApp(MyApp());
 }
 
@@ -32,7 +38,7 @@ class MyApp extends StatelessWidget {
           backgroundColor: Colors.yellow,
         ),
       ),
-      home: WelcomeScreen(),
+      home: SignupScreen(),
       routes: {
         '/home': (context) => HomeScreen(),
         '/categories': (context) => ProductCategoriesPage(),
@@ -41,8 +47,8 @@ class MyApp extends StatelessWidget {
         '/cart': (context) => CartScreen(),
         '/checkout': (context) => CheckoutScreen(),
         // '/notifications': (context) => NotificationsScreen(),
-        // '/register': (context) => RegisterScreen(),
-        // '/login': (context) => LoginScreen(),
+        // '/signup': (context) => SignupScreen(),
+        '/login': (context) => LoginScreen(),
         // '/profile': (context) => ProfileScreen(),
       },
     );
