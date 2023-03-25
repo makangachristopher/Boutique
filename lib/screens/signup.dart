@@ -1,9 +1,6 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SignupScreen extends StatefulWidget {
   @override
@@ -12,257 +9,199 @@ class SignupScreen extends StatefulWidget {
 
 class _SignupScreenState extends State<SignupScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final _confirmPasswordController = TextEditingController();
-  final _phoneNumberController = TextEditingController();
-  final _firstNameController = TextEditingController();
-  final _lastNameController = TextEditingController();
-
-  File? _profilePhoto;
-
-  String _errorMessage = '';
+  final _auth = FirebaseAuth.instance;
+  final _firestore = FirebaseFirestore.instance;
+  late String _userName;
+  late String _email;
+  late String _phoneNumber;
+  late String _password;
+  late String _confirmPassword;
   bool _isLoading = false;
+  String? _photoUrl;
+  final TextEditingController _passwordController = TextEditingController();
 
-  Future<void> _signup() async {
-    final email = _emailController.text.trim();
-    final password = _passwordController.text.trim();
-    final phoneNumber = _phoneNumberController.text.trim();
-    final firstName = _firstNameController.text.trim();
-    final lastName = _lastNameController.text.trim();
+  void _submitForm() async {
+    if (_formKey.currentState != null && _formKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
+      // continue with the signup process
 
-    setState(() {
-      _isLoading = true;
-    });
 
-    try {
-      final userCredential =
-          await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-
-      final user = userCredential.user;
-      final userId = user!.uid;
-
-      if (_profilePhoto != null) {
-        final ref = FirebaseStorage.instance.ref().child('users').child(userId);
-
-        await ref.putFile(_profilePhoto!);
-        final downloadUrl = await ref.getDownloadURL();
-
-        await user.updatePhotoURL(downloadUrl);
+      try {
+        final newUser = await _auth.createUserWithEmailAndPassword(
+          email: _email,
+          password: _password,
+        );
+        await _firestore.collection('users').doc(newUser.user?.uid).set({
+          'username': _userName,
+          'email': _email,
+          'phone_number': _phoneNumber,
+          'profile_photo': '',
+        });
+        Navigator.of(context).pushReplacementNamed('/home');
+      } catch (e) {
+        setState(() {
+          _isLoading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.toString()),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
-
-      await user.updateDisplayName('$firstName $lastName');
-
-      // Store additional user data, such as phone number, in a Firestore database
-      // or in the Firebase Realtime Database.
-
-      Navigator.pushReplacementNamed(context, '/home');
-    } on FirebaseAuthException catch (e) {
-      setState(() {
-        _errorMessage = e.message ?? 'An unknown error occurred';
-      });
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
-    }
-  }
-
-  Future<void> _pickProfilePhoto() async {
-    final pickedFile =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
-
-    if (pickedFile != null) {
-      setState(() {
-        _profilePhoto = File(pickedFile.path);
-      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Container(
-          height: MediaQuery.of(context).size.height,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              SizedBox(height: 50.0),
-              Text(
-                'Sign up',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 30.0,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-
-              Expanded(
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 20.0),
-                  height: MediaQuery.of(context).size.height,
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        GestureDetector(
-                          onTap: _pickProfilePhoto,
-                          child: Container(
-                            height: 120.0,
-                            width: 120.0,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: Colors.grey,
-                                width: 2.0,
-                              ),
-                            ),
-                            child: _profilePhoto == null
-                                ? Icon(
-                                    Icons.person,
-                                    size: 80.0,
-                                    color: Colors.grey,
-                                  )
-                                : ClipOval(
-                                    child: Image.file(
-                                      _profilePhoto!,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                          ),
-                        ),
-                        SizedBox(height: 20.0),
-                        TextFormField(
-                          controller: _firstNameController,
-                          decoration: InputDecoration(
-                            hintText: 'First name',
-                          ),
-                          validator: (value) {
-                            if (value!.isEmpty) {
-                              return 'Firstname is required';
-                            }
-                            return null;
-                          },
-                        ),
-                        SizedBox(height: 20.0),
-                        TextFormField(
-                          controller: _lastNameController,
-                          decoration: InputDecoration(
-                            hintText: 'Last name',
-                          ),
-                          validator: (value) {
-                            if (value!.isEmpty) {
-                              return 'Last name is required';
-                            }
-                            return null;
-                          },
-                        ),
-                        SizedBox(height: 20.0),
-                        TextFormField(
-                          controller: _emailController,
-                          decoration: InputDecoration(
-                            hintText: 'Email',
-                          ),
-                          keyboardType: TextInputType.emailAddress,
-                          validator: (value) {
-                            if (value!.isEmpty) {
-                              return 'Email is required';
-                            }
-                            if (!value.contains('@')) {
-                              return 'Please enter a valid email';
-                            }
-                            return null;
-                          },
-                        ),
-                        SizedBox(height: 20.0),
-                        TextFormField(
-                          controller: _passwordController,
-                          decoration: InputDecoration(
-                            hintText: 'Password',
-                          ),
-                          obscureText: true,
-                          validator: (value) {
-                            if (value!.isEmpty) {
-                              return 'Password is required';
-                            }
-                            if (value.length < 6) {
-                              return 'Password must be at least 6 characters';
-                            }
-                            return null;
-                          },
-                        ),
-                        SizedBox(height: 20.0),
-                        TextFormField(
-                          controller: _confirmPasswordController,
-                          decoration: InputDecoration(
-                            hintText: 'Confirm password',
-                          ),
-                          obscureText: true,
-                          validator: (value) {
-                            if (value!.isEmpty) {
-                              return 'Please confirm password';
-                            }
-                            if (value != _passwordController.text) {
-                              return 'Passwords do not match';
-                            }
-                            return null;
-                          },
-                        ),
-                        SizedBox(height: 20.0),
-                        TextFormField(
-                          controller: _phoneNumberController,
-                          decoration: InputDecoration(
-                            hintText: 'Phone number',
-                          ),
-                          keyboardType: TextInputType.phone,
-                          validator: (value) {
-                            if (value!.isEmpty) {
-                              return 'Phone number is required';
-                            }
-                            if (value.length < 10) {
-                              return 'Please enter a valid phone number';
-                            }
-                            return null;
-                          },
-                        ),
-                        SizedBox(height: 20.0),
-                        _isLoading
-                            ? CircularProgressIndicator()
-                            : ElevatedButton(
-                                onPressed: () {
-                                  if (_formKey.currentState!.validate()) {
-                                    _signup();
-                                  }
-                                },
-                                child: Text('SIGN UP'),
-                              ),
-                        SizedBox(height: 20.0),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.pushReplacementNamed(context, '/login');
-                          },
-                          child: Text('Already have an account? Log in here'),
-                        ),
-                        if (_errorMessage.isNotEmpty)
-                          Text(
-                            _errorMessage,
-                            style: TextStyle(color: Colors.red),
-                          ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
+        backgroundColor: Colors.yellow,
+        body: SingleChildScrollView(
+        child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+        Container(
+        padding: EdgeInsets.symmetric(vertical: 20.0),
+    child: Text(
+    'Sign up',
+    style: TextStyle(fontSize: 32.0),
+    ),
+    ),
+    Container(
+    padding: EdgeInsets.all(20.0),
+    margin: EdgeInsets.all(20.0),
+    decoration: BoxDecoration(
+    color: Colors.white,
+    borderRadius: BorderRadius.only(
+    topLeft: Radius.circular(20.0),
+    ),
+    ),
+    child: Form(
+    key: _formKey,
+    child: Column(
+    children: <Widget>[
+    TextFormField(
+    decoration: InputDecoration(labelText: 'Username'),
+    validator: (value) {
+    if (value == null || value.isEmpty) {
+    return 'Please enter your username';
+    }
+    return null;
+    },
+    onSaved: (value) {
+    _userName = value?.trim() ?? '';
+    },
+    ),
+    TextFormField(
+    decoration: InputDecoration(labelText: 'Email'),
+    validator: (value) {
+    if (value == null || value.isEmpty || !value.contains('@')) {
+    return 'Please enter a valid email address';
+    }
+    return null;
+    },
+    onSaved: (value) {
+    _email = value?.trim() ?? '';
+    },
+    ),
+    TextFormField(
+    decoration:
+    InputDecoration(labelText: 'Phone Number'),
+    validator: (value) {
+    if (value == null || value.isEmpty) {
+    return 'Please enter your phone number';
+    }
+    return null;
+    },
+    onSaved: (value) {
+    _phoneNumber = value?.trim() ?? '';
+    },
+    )
+,
+    TextFormField(
+    decoration: InputDecoration(labelText: 'Password'),
+    obscureText: true,
+    validator: (value) {
+    if (value == null ||value.isEmpty || value.length < 6) {
+    return 'Password must be at least 6 characters long';
+    }
+    return null;
+    },
+    onSaved: (value) {
+    _password = value?.trim() ?? '';
+    },
+    ),
+    TextFormField(
+    decoration:
+    InputDecoration(labelText: 'Confirm Password'),
+    obscureText: true,
+    validator: (String? value) {
+      if (value!.isEmpty) {
+        return 'Please enter your password again';
+      } else if (value != _passwordController.text) {
+        return 'Passwords do not match';
+      }
+      return null;
+    },
+      onSaved: (String? value) {
+        _confirmPassword = value!;
+      },
+    ),
+      SizedBox(
+        height: 20.0,
       ),
-    );
+      TextFormField(
+        decoration: InputDecoration(labelText: 'Phone Number'),
+        keyboardType: TextInputType.phone,
+        validator: (String? value) {
+          if (value!.isEmpty) {
+            return 'Please enter your phone number';
+          }
+          return null;
+        },
+        onSaved: (String? value) {
+          _phoneNumber = value!;
+        },
+      ),
+      SizedBox(
+        height: 20.0,
+      ),
+      TextFormField(
+        decoration: InputDecoration(labelText: 'Profile Photo'),
+        keyboardType: TextInputType.url,
+        validator: (String? value) {
+          if (value!.isEmpty) {
+            return 'Please enter a valid photo url';
+          }
+          return null;
+        },
+        onSaved: (String? value) {
+          _photoUrl = value!;
+        },
+      ),
+      SizedBox(
+        height: 20.0,
+      ),
+      ElevatedButton(
+        onPressed: _submitForm,
+        child: Text('Submit'),
+      ),
+      SizedBox(
+        height: 20.0,
+      ),
+      TextButton(
+        onPressed: () {
+          Navigator.pushNamed(context, '/login');
+        },
+        child: Text('Already have an account? Login'),
+      ),
+    ],
+    ),
+    ),
+    ),
+   ] ),
+    ));
   }
 }

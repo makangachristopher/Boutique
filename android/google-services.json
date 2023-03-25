@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "695670065487",
+    "project_id": "laepic-bda39",
+    "storage_bucket": "laepic-bda39.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:695670065487:android:cf8eac3bcd1f0a0fdd1d3a",
+        "android_client_info": {
+          "package_name": "smaccstechnologies.com"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "695670065487-akgusi95hhad9ps2cje48h2cupbmetk0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB2-EbvPvVBA8IDlX6FEco7_Ft0PMSBa90"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "695670065487-akgusi95hhad9ps2cje48h2cupbmetk0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

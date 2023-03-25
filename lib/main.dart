@@ -10,11 +10,12 @@ import 'package:la_pic/screens/check_out_screen.dart';
 import 'package:la_pic/screens/welcome_screen.dart';
 import 'package:la_pic/screens/signup.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:la_pic/screens/account_details.dart';
 
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // await Firebase.initializeApp();
+  await Firebase.initializeApp();
   runApp(MyApp());
 }
 
@@ -38,7 +39,7 @@ class MyApp extends StatelessWidget {
           backgroundColor: Colors.yellow,
         ),
       ),
-      home: SignupScreen(),
+      home: AccountDetailsScreen(),
       routes: {
         '/home': (context) => HomeScreen(),
         '/categories': (context) => ProductCategoriesPage(),
@@ -49,7 +50,7 @@ class MyApp extends StatelessWidget {
         // '/notifications': (context) => NotificationsScreen(),
         // '/signup': (context) => SignupScreen(),
         '/login': (context) => LoginScreen(),
-        // '/profile': (context) => ProfileScreen(),
+        // '/profile': (context) => AccountDetailsScreen(),
       },
     );
   }
